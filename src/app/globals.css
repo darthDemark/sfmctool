@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0b0f14;
+  --color-panel: #111827;
+  --color-card: #131a22;
+  --color-deep: #0f172a;
+  --color-line: #1f2937;
+
+  --color-text: #f9fafb;
+  --color-text-secondary: #cbd5e1;
+  --color-muted: #94a3b8;
+
+  --color-blue: #2563eb;
+  --color-electric: #4f8cff;
+  --color-violet: #8b5cf6;
+  --color-cyan: #22d3ee;
+  --color-green: #10b981;
+  --color-amber: #f59e0b;
+  --color-red: #ef4444;
+
+  --font-sans: var(--font-inter), var(--font-geist), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --radius-xl: 14px;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: rgba(79, 140, 255, 0.3);
+    color: #fff;
+  }
+}
+
+@layer utilities {
+  .gradient-text {
+    background-image: linear-gradient(
+      90deg,
+      var(--color-electric),
+      var(--color-violet)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .gradient-primary {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-blue),
+      var(--color-violet)
+    );
+  }
+
+  .grid-bg {
+    background-image: linear-gradient(
+        to right,
+        rgba(31, 41, 55, 0.35) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(31, 41, 55, 0.35) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 0 1px rgba(79, 140, 255, 0.2),
+      0 8px 40px -12px rgba(37, 99, 235, 0.45);
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: var(--color-line);
+    border-radius: 9999px;
+  }
+}
+
+/* React Flow dark theme overrides */
+.react-flow__attribution {
+  display: none;
+}
+.react-flow__edge-path {
+  stroke: #4f8cff;
+  stroke-width: 2;
+}
+.react-flow__handle {
+  background: #4f8cff;
+  border: 2px solid #0b0f14;
+  width: 9px;
+  height: 9px;
+}
+.react-flow__controls-button {
+  background: #131a22;
+  border-bottom: 1px solid #1f2937;
+  color: #cbd5e1;
+  fill: #cbd5e1;
+}
+.react-flow__controls-button:hover {
+  background: #1f2937;
+}
