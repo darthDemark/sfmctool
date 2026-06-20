@@ -77,6 +77,49 @@ const has = (q: string, re: RegExp) => re.test(q);
 export const sqlLessons: SqlLesson[] = [
   // ----------------------------- BEGINNER -----------------------------
   {
+    id: "sql-b0",
+    level: "Beginner",
+    title: "What is SQL in Marketing Cloud?",
+    xp: 80,
+    concept:
+      "In Marketing Cloud, SQL runs inside Automation Studio Query Activities. It reads from Data Extensions and system Data Views (like _Open, _Sent) and writes the result into a target Data Extension you then send to. You are not querying a live database — you are shaping audiences. Start simple: select a few columns from the Subscribers DE.",
+    task: [
+      "Return SubscriberKey, FirstName, and Email from the Subscribers DE.",
+      "This is the shape every segmentation query starts from.",
+    ],
+    starter: `SELECT
+    SubscriberKey,
+    FirstName,
+    Email
+FROM Subscribers`,
+    schema: [T.subscribers],
+    checks: [
+      { label: "Uses SELECT", test: (q) => has(q, /\bselect\b/) },
+      {
+        label: "Reads from the Subscribers DE",
+        hint: "FROM Subscribers",
+        test: (q) => has(q, /from\s+subscribers/),
+      },
+      {
+        label: "Returns the subscriber key",
+        test: (q) => has(q, /subscriberkey/),
+      },
+    ],
+    expectedColumns: ["SubscriberKey", "FirstName", "Email"],
+    expectedRows: [
+      ["SK-10293", "Maya", "maya.lin@example.com"],
+      ["SK-77310", "Diego", "diego.ramos@example.com"],
+      ["SK-22014", "Priya", "priya.shah@example.com"],
+      ["SK-99001", "Liam", "liam.ok@example.com"],
+    ],
+    notes: [
+      {
+        tone: "info",
+        text: "Query Activities have a runtime limit and write to a target DE. The SELECT you write here is the audience that downstream sends will use — get it wrong and you email the wrong people.",
+      },
+    ],
+  },
+  {
     id: "sql-b1",
     level: "Beginner",
     title: "SELECT basics",

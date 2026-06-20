@@ -3,6 +3,7 @@
 import { Search, Bell, Command, Flame, Menu } from "lucide-react";
 import { user } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
+import { useProgress } from "@/lib/progress";
 
 export function TopBar({
   title,
@@ -11,6 +12,7 @@ export function TopBar({
   title: string;
   onMenuClick?: () => void;
 }) {
+  const { store } = useProgress();
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-line bg-bg/80 px-4 backdrop-blur-md md:px-6">
       <button
@@ -38,7 +40,7 @@ export function TopBar({
       <div className="ml-auto flex items-center gap-2 lg:ml-0">
         <Badge tone="amber" className="hidden sm:inline-flex">
           <Flame className="h-3 w-3" />
-          {user.streak} day streak
+          {store.streak} day streak
         </Badge>
         <button
           className="relative grid h-9 w-9 place-items-center rounded-lg border border-line text-muted hover:text-text"

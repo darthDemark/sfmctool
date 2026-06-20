@@ -5,22 +5,28 @@ import {
   GitBranch,
   Workflow,
   Bug,
+  Boxes,
   LayoutDashboard,
   FlaskConical,
   Radio,
   MessageSquareCode,
   Award,
   TrendingUp,
+  GraduationCap,
 } from "lucide-react";
 
 export const user = {
   name: "Heron",
   role: "Marketing Automation Specialist",
-  xp: 12430,
-  operationalReadiness: 67,
-  rank: "Operator II",
-  streak: 14,
 };
+
+export function rankForXp(xp: number): string {
+  if (xp >= 9000) return "Operator III";
+  if (xp >= 4000) return "Operator II";
+  if (xp >= 1500) return "Operator I";
+  if (xp >= 300) return "Recruit";
+  return "Trainee";
+}
 
 export type NavItem = {
   label: string;
@@ -31,6 +37,7 @@ export type NavItem = {
 
 export const navItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Academy", href: "/academy", icon: GraduationCap },
   { label: "Labs", href: "/labs", icon: FlaskConical },
   { label: "Simulations", href: "/labs/journey-builder", icon: Radio },
   {
@@ -44,20 +51,6 @@ export const navItems: NavItem[] = [
   { label: "Progress", href: "/progress", icon: TrendingUp },
 ];
 
-export type Skill = {
-  name: string;
-  value: number;
-  color: string;
-};
-
-export const skills: Skill[] = [
-  { name: "AMPscript", value: 83, color: "var(--color-electric)" },
-  { name: "SQL", value: 71, color: "var(--color-cyan)" },
-  { name: "Journeys", value: 92, color: "var(--color-violet)" },
-  { name: "Automation", value: 56, color: "var(--color-amber)" },
-  { name: "Debugging", value: 61, color: "var(--color-green)" },
-];
-
 export type Lab = {
   slug: string;
   title: string;
@@ -66,10 +59,9 @@ export type Lab = {
   icon: LucideIcon;
   accent: string;
   difficulty: "Foundational" | "Intermediate" | "Advanced";
-  missions: number;
-  estMinutes: number;
-  skills: string[];
+  unit: string; // "lessons" | "challenges" | "modes" | "incidents"
   href: string;
+  skills: string[];
 };
 
 export const labs: Lab[] = [
@@ -78,12 +70,11 @@ export const labs: Lab[] = [
     title: "AMPscript Lab",
     tagline: "Personalization & dynamic content",
     description:
-      "Practice personalization, dynamic content, and server-side logic against realistic data extensions.",
+      "A guided path from variables to production-safe patterns, with live email previews and validation.",
     icon: Code2,
     accent: "var(--color-electric)",
     difficulty: "Intermediate",
-    missions: 12,
-    estMinutes: 25,
+    unit: "16 lessons",
     skills: ["AMPscript", "Personalization", "Content Blocks"],
     href: "/labs/ampscript",
   },
@@ -92,28 +83,39 @@ export const labs: Lab[] = [
     title: "SQL Lab",
     tagline: "Segmentation & query logic",
     description:
-      "Write segmentation queries against a simulated SFMC schema and get scored on correctness and efficiency.",
+      "Structured SQL training against a simulated SFMC schema, scored against expected output.",
     icon: Database,
     accent: "var(--color-cyan)",
     difficulty: "Intermediate",
-    missions: 14,
-    estMinutes: 30,
+    unit: "16 challenges",
     skills: ["SQL", "Segmentation", "Data Views"],
     href: "/labs/sql",
   },
   {
     slug: "journey-builder",
     title: "Journey Builder Lab",
-    tagline: "Design & simulate journeys",
+    tagline: "Learn, build & simulate journeys",
     description:
-      "Build multi-step journeys on a live canvas, then simulate contact flow and inspect path counts.",
+      "Understand every node, build on a live canvas, then watch contacts flow through an animated simulation.",
     icon: GitBranch,
     accent: "var(--color-violet)",
     difficulty: "Advanced",
-    missions: 9,
-    estMinutes: 40,
-    skills: ["Journey Builder", "Decision Splits", "Wait Activities"],
+    unit: "3 modes",
+    skills: ["Journey Builder", "Decision Splits", "Simulation"],
     href: "/labs/journey-builder",
+  },
+  {
+    slug: "automation-studio",
+    title: "Automation Studio Lab",
+    tagline: "Backend automation & recovery",
+    description:
+      "Learn the activities, build a daily import pipeline, simulate the run, then troubleshoot a failure.",
+    icon: Workflow,
+    accent: "var(--color-amber)",
+    difficulty: "Intermediate",
+    unit: "4 modes",
+    skills: ["Automation Studio", "Scheduling", "Recovery"],
+    href: "/labs/automation-studio",
   },
   {
     slug: "troubleshooting",
@@ -124,92 +126,107 @@ export const labs: Lab[] = [
     icon: Bug,
     accent: "var(--color-red)",
     difficulty: "Advanced",
-    missions: 8,
-    estMinutes: 35,
-    skills: ["Debugging", "Automation Studio", "Root Cause"],
+    unit: "incidents",
+    skills: ["Debugging", "Root Cause", "Production"],
     href: "/labs/troubleshooting",
   },
 ];
 
-export const automationLab: Lab = {
-  slug: "automation",
-  title: "Automation Studio",
-  tagline: "Schedules, file drops & SQL automations",
-  description:
-    "Wire up multi-step automations with SQL query activities, file transfers, and verification steps.",
-  icon: Workflow,
-  accent: "var(--color-amber)",
-  difficulty: "Intermediate",
-  missions: 10,
-  estMinutes: 30,
-  skills: ["Automation Studio", "Scheduling", "SSJS"],
-  href: "/labs",
-};
-
-export type Mission = {
-  id: string;
-  code: string;
+export type AcademyTrack = {
+  slug: string;
   title: string;
-  lab: string;
-  status: "completed" | "in-progress" | "locked";
-  difficulty: string;
-  xp: number;
+  tagline: string;
+  icon: LucideIcon;
+  accent: string;
+  href: string;
+  total: number;
+  beginner: number;
+  intermediate: number;
+  advanced: number;
+  // how to derive completed-lesson count for this track
+  source:
+    | { kind: "lessons"; prefix: string }
+    | { kind: "category"; category: string };
 };
 
-export const missions: Mission[] = [
+export const academyTracks: AcademyTrack[] = [
   {
-    id: "m1",
-    code: "Mission 01",
-    title: "Welcome Email Personalization",
-    lab: "AMPscript",
-    status: "completed",
-    difficulty: "Foundational",
-    xp: 120,
+    slug: "ampscript",
+    title: "AMPscript Academy",
+    tagline: "Personalization & server-side logic",
+    icon: Code2,
+    accent: "var(--color-electric)",
+    href: "/labs/ampscript",
+    total: 16,
+    beginner: 6,
+    intermediate: 5,
+    advanced: 5,
+    source: { kind: "lessons", prefix: "amp-" },
   },
   {
-    id: "m2",
-    code: "Mission 02",
-    title: "Loyalty Tier Lookup",
-    lab: "AMPscript",
-    status: "completed",
-    difficulty: "Intermediate",
-    xp: 180,
+    slug: "sql",
+    title: "SQL Academy",
+    tagline: "Segmentation & data views",
+    icon: Database,
+    accent: "var(--color-cyan)",
+    href: "/labs/sql",
+    total: 16,
+    beginner: 6,
+    intermediate: 5,
+    advanced: 5,
+    source: { kind: "lessons", prefix: "sql-" },
   },
   {
-    id: "m3",
-    code: "Mission 03",
-    title: "Active Subscriber Segment",
-    lab: "SQL",
-    status: "completed",
-    difficulty: "Intermediate",
-    xp: 200,
+    slug: "journey-builder",
+    title: "Journey Builder Academy",
+    tagline: "Automated customer paths",
+    icon: GitBranch,
+    accent: "var(--color-violet)",
+    href: "/labs/journey-builder",
+    total: 12,
+    beginner: 6,
+    intermediate: 4,
+    advanced: 2,
+    source: { kind: "category", category: "Journey Builder" },
   },
   {
-    id: "m4",
-    code: "Mission 04",
-    title: "Win-Back Journey",
-    lab: "Journey Builder",
-    status: "completed",
-    difficulty: "Advanced",
-    xp: 260,
+    slug: "automation-studio",
+    title: "Automation Studio Academy",
+    tagline: "Backend automation pipelines",
+    icon: Workflow,
+    accent: "var(--color-amber)",
+    href: "/labs/automation-studio",
+    total: 10,
+    beginner: 5,
+    intermediate: 3,
+    advanced: 2,
+    source: { kind: "category", category: "Automation Studio" },
   },
   {
-    id: "m5",
-    code: "Mission 05",
-    title: "Cart Recovery Dynamic Content",
-    lab: "AMPscript",
-    status: "in-progress",
-    difficulty: "Advanced",
-    xp: 300,
+    slug: "data-modeling",
+    title: "Data Modeling Academy",
+    tagline: "Data extensions & relationships",
+    icon: Boxes,
+    accent: "var(--color-green)",
+    href: "/labs/sql",
+    total: 8,
+    beginner: 4,
+    intermediate: 3,
+    advanced: 1,
+    source: { kind: "category", category: "SQL" },
   },
   {
-    id: "m6",
-    code: "Mission 06",
-    title: "RFM Scoring Query",
-    lab: "SQL",
-    status: "locked",
-    difficulty: "Advanced",
-    xp: 320,
+    slug: "troubleshooting",
+    title: "Troubleshooting Academy",
+    tagline: "Read logs, find root cause",
+    icon: Bug,
+    accent: "var(--color-red)",
+    href: "/labs/troubleshooting",
+    total: 8,
+    beginner: 3,
+    intermediate: 3,
+    advanced: 2,
+    source: { kind: "category", category: "Troubleshooting" },
   },
 ];
 
@@ -229,44 +246,3 @@ export const criticalIncident: Incident = {
   summary:
     "Contacts are entering the Welcome Series journey but never advancing past the first wait activity. 4,210 contacts stuck.",
 };
-
-export type Activity = {
-  id: string;
-  text: string;
-  time: string;
-  type: "success" | "info" | "warning";
-};
-
-export const recentActivity: Activity[] = [
-  { id: "a1", text: "Completed Mission 04 — Win-Back Journey", time: "2h ago", type: "success" },
-  { id: "a2", text: "Earned badge: Decision Split Master", time: "5h ago", type: "info" },
-  { id: "a3", text: "Query scored 92% on Active Subscriber Segment", time: "1d ago", type: "success" },
-  { id: "a4", text: "Incident INC-198 resolved in 6m 42s", time: "2d ago", type: "warning" },
-];
-
-export const xpHistory = [
-  { week: "W1", xp: 1800 },
-  { week: "W2", xp: 3200 },
-  { week: "W3", xp: 4100 },
-  { week: "W4", xp: 6400 },
-  { week: "W5", xp: 8200 },
-  { week: "W6", xp: 9800 },
-  { week: "W7", xp: 11200 },
-  { week: "W8", xp: 12430 },
-];
-
-export type Achievement = {
-  id: string;
-  title: string;
-  description: string;
-  earned: boolean;
-};
-
-export const achievements: Achievement[] = [
-  { id: "ac1", title: "First Deploy", description: "Complete your first mission", earned: true },
-  { id: "ac2", title: "Decision Split Master", description: "Build 5 journeys with decision splits", earned: true },
-  { id: "ac3", title: "Query Sniper", description: "Score 90%+ on 3 SQL missions", earned: true },
-  { id: "ac4", title: "Incident Commander", description: "Resolve 5 critical incidents", earned: false },
-  { id: "ac5", title: "AMPscript Architect", description: "Reach 90% AMPscript readiness", earned: false },
-  { id: "ac6", title: "Cert Ready", description: "Pass all certification practice exams", earned: false },
-];

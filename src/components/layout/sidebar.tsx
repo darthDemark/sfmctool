@@ -5,9 +5,11 @@ import { usePathname } from "next/navigation";
 import { navItems, user } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useProgress } from "@/lib/progress";
 
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const { stats, hydrated } = useProgress();
 
   return (
     <div className="flex h-full flex-col bg-panel/60">
@@ -90,7 +92,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         <div className="mt-2 flex items-center justify-between rounded-lg border border-line bg-deep/60 px-3 py-1.5">
           <span className="text-[11px] font-medium text-muted">XP</span>
           <span className="font-mono text-xs font-semibold text-cyan">
-            {user.xp.toLocaleString()}
+            {hydrated ? stats.xp.toLocaleString() : "—"}
           </span>
         </div>
       </div>
