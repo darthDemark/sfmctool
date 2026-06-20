@@ -17,6 +17,7 @@ import { ArchitectNotes } from "@/components/labs/architect-notes";
 import { SimulationLogs, type LogLine } from "@/components/labs/simulation-logs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
 
 const logs: LogLine[] = [
@@ -75,12 +76,19 @@ const clues = [
 ];
 
 export default function TroubleshootingLab() {
+  const { resolveIncident } = useProgress();
   const [tab, setTab] = useState("logs");
   const [selected, setSelected] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   const chosen = causes.find((c) => c.id === selected);
   const correct = chosen?.correct;
+
+  const submitDiagnosis = () => {
+    setSubmitted(true);
+    if (chosen?.correct)
+      resolveIncident("Resolved incident INC-204 — Welcome Series journey");
+  };
 
   return (
     <AppShell title="Troubleshooting Lab">
@@ -92,7 +100,7 @@ export default function TroubleshootingLab() {
             Teach operational troubleshooting.
           </span>
         </div>
-        <span className="font-mono text-xs text-cyan">+340 XP available</span>
+        <span className="font-mono text-xs text-cyan">Resolve to earn XP</span>
       </div>
 
       <div className="space-y-4">
@@ -315,7 +323,7 @@ export default function TroubleshootingLab() {
               <Button
                 size="sm"
                 disabled={!selected}
-                onClick={() => setSubmitted(true)}
+                onClick={submitDiagnosis}
               >
                 Submit Diagnosis
               </Button>
@@ -326,7 +334,7 @@ export default function TroubleshootingLab() {
                     correct ? "text-green" : "text-red"
                   )}
                 >
-                  {correct ? "Root cause confirmed (+340 XP)" : "Not quite — review the logs"}
+                  {correct ? "Root cause confirmed — incident logged" : "Not quite — review the logs"}
                 </span>
               )}
             </div>

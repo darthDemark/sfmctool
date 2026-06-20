@@ -75,4 +75,6 @@ src/
 
 ## Mock User
 
-Heron — Marketing Automation Specialist · 12,430 XP · 67% Operational Readiness.
+Heron — Marketing Automation Specialist. XP, readiness, badges, and
+competency status are all computed from your own activity (stored in
+`localStorage`), not hardcoded.

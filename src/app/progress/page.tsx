@@ -5,7 +5,6 @@ import { TrendingUp, Award, Target, Zap, Lock, ArrowRight } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { ProgressRing } from "@/components/dashboard/progress-ring";
 import { SkillBar } from "@/components/dashboard/skill-bar";
 import { MetricCard } from "@/components/dashboard/metric-card";

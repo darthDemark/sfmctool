@@ -7,7 +7,6 @@ import {
   ArrowRight,
   Award,
   Flame,
-  Play,
   Zap,
   CheckCircle2,
   Info,

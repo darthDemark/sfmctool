@@ -52,6 +52,7 @@ import {
   commonMistakes,
   simSummary,
 } from "@/lib/journey-content";
+import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
 
 type Mode = "learn" | "build" | "simulate";
@@ -126,6 +127,7 @@ const simStateMeta = {
 } as const;
 
 export default function JourneyBuilderLab() {
+  const { addMilestone, recordSim } = useProgress();
   const [mode, setMode] = useState<Mode>("learn");
   const [nodes, , onNodesChange] = useNodesState(BASE_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(BASE_EDGES);
@@ -140,9 +142,18 @@ export default function JourneyBuilderLab() {
     [setEdges]
   );
 
-  const onNodeClick: NodeMouseHandler = useCallback((_e, node) => {
-    setSelectedId(node.id);
-  }, []);
+  const onNodeClick: NodeMouseHandler = useCallback(
+    (_e, node) => {
+      setSelectedId(node.id);
+      addMilestone("jb-build");
+    },
+    [addMilestone]
+  );
+
+  useEffect(() => {
+    if (mode === "learn") addMilestone("jb-learn");
+    if (mode === "build") addMilestone("jb-build");
+  }, [mode, addMilestone]);
 
   // Drive the simulation step sequence.
   useEffect(() => {
@@ -159,6 +170,8 @@ export default function JourneyBuilderLab() {
     setMode("simulate");
     setSimStep(0);
     setSimState("running");
+    recordSim("journey", "Ran a Journey Builder simulation");
+    addMilestone("jb-sim");
   };
 
   const isSimMode = mode === "simulate";
