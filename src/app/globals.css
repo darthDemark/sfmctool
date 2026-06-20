@@ -98,6 +98,36 @@
   }
 }
 
+/* Journey simulation animations */
+@keyframes jbPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px var(--jb-ring, transparent),
+      0 0 0 0 var(--jb-glow, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 1px var(--jb-ring, transparent),
+      0 0 22px 4px var(--jb-glow, transparent);
+  }
+}
+.jb-node-active {
+  animation: jbPulse 1.3s ease-in-out infinite;
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.jb-reveal {
+  animation: countUp 0.4s ease-out both;
+}
+
 /* React Flow dark theme overrides */
 .react-flow__attribution {
   display: none;
