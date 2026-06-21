@@ -93,7 +93,11 @@ function splitArgs(input: string): string[] {
   return args;
 }
 
-function resolve(raw: string, ctx: Ctx): Value {
+function resolve(raw: string | undefined, ctx: Ctx): Value {
+  // Be defensive: partially-typed code (e.g. a function call missing
+  // arguments) can call resolve() with undefined. Never throw — the
+  // evaluator runs live on every keystroke.
+  if (raw == null) return "";
   const token = raw.trim();
 
   // string literal
@@ -194,7 +198,8 @@ function resolve(raw: string, ctx: Ctx): Value {
   return token;
 }
 
-function stripQuotes(s: string): string {
+function stripQuotes(s: string | undefined): string {
+  if (s == null) return "";
   return s.trim().replace(/^"([\s\S]*)"$/, "$1");
 }
 
@@ -223,7 +228,8 @@ function compare(left: Value, op: string, right: Value): boolean {
   }
 }
 
-function evalCondition(expr: string, ctx: Ctx): boolean {
+function evalCondition(expr: string | undefined, ctx: Ctx): boolean {
+  if (expr == null) return false;
   const c = expr.trim();
   const notEmpty = c.match(/^NOT\s+EMPTY\s*\(([\s\S]+)\)$/i);
   if (notEmpty) return !isEmpty(resolve(notEmpty[1], ctx));
@@ -373,31 +379,47 @@ export function renderAmpscript(
 ): EvalResult {
   const ctx: Ctx = { vars: {}, contact, tables, output: "", errors: [] };
 
-  const blockMatch = code.match(/%%\[([\s\S]*?)\]%%/);
-  const block = blockMatch ? blockMatch[1] : "";
+  // This runs live on every keystroke, against incomplete code. It must
+  // NEVER throw — a thrown error during render crashes the React tree.
+  try {
+    const blockMatch = code.match(/%%\[([\s\S]*?)\]%%/);
+    const block = blockMatch ? blockMatch[1] : "";
 
-  // Strip block comments, then split + trim lines.
-  const cleaned = block.replace(/\/\*[\s\S]*?\*\//g, "");
-  const lines = cleaned
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean);
+    // Strip block comments, then split + trim lines.
+    const cleaned = block.replace(/\/\*[\s\S]*?\*\//g, "");
+    const lines = cleaned
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
 
-  run(lines, ctx);
+    run(lines, ctx);
 
-  let body = code.replace(/%%\[[\s\S]*?\]%%/g, "");
-  // Prepend any OutputLine content produced inside the block.
-  body = (ctx.output ? ctx.output : "") + body;
+    let body = code.replace(/%%\[[\s\S]*?\]%%/g, "");
+    // Prepend any OutputLine content produced inside the block.
+    body = (ctx.output ? ctx.output : "") + body;
 
-  // Substitute %%= ... =%% expressions.
-  body = body.replace(/%%=\s*([\s\S]+?)\s*=%%/g, (_m, expr: string) => {
-    return String(resolve(expr.trim(), ctx));
-  });
+    // Substitute %%= ... =%% expressions.
+    body = body.replace(/%%=\s*([\s\S]+?)\s*=%%/g, (_m, expr: string) => {
+      try {
+        return String(resolve(expr.trim(), ctx));
+      } catch {
+        return "";
+      }
+    });
 
-  body = body.trim();
+    body = body.trim();
 
-  const vars: Record<string, string> = {};
-  for (const [k, v] of Object.entries(ctx.vars)) vars[k] = toDisplay(v);
+    const vars: Record<string, string> = {};
+    for (const [k, v] of Object.entries(ctx.vars)) vars[k] = toDisplay(v);
 
-  return { output: body, vars, rawVars: ctx.vars, errors: ctx.errors };
+    return { output: body, vars, rawVars: ctx.vars, errors: ctx.errors };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "unknown error";
+    return {
+      output: "",
+      vars: {},
+      rawVars: {},
+      errors: [...ctx.errors, `Could not render (incomplete code): ${message}`],
+    };
+  }
 }
